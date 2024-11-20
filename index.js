@@ -101,6 +101,51 @@ app.get('/productDetails/:id', (req, res) => {
 });
 
 
+app.post("/createOrder", (req, res) => {
+  const { phoneNumber, orderTrackNumber, orderInformation } = req.body;
+
+  const query = `INSERT INTO \`Order\` (phoneNumber, orderTrackNumber, orderInformation) VALUES (?, ?, ?)`;
+
+  db.query(query, [phoneNumber, orderTrackNumber, JSON.stringify(orderInformation)], (err, result) => {
+    if (err) {
+      console.error("Error inserting order:", err);
+      return res.status(500).json({ message: "Failed to create order." });
+    }
+    res.status(201).json({ message: "Order created successfully!", orderTrackNumber: orderTrackNumber });
+  });
+});
+
+
+
+
+
+// Search API Endpoint
+app.get("/api/search", (req, res) => {
+  const { query } = req.query;
+
+  if (!query) {
+    return res.status(400).json({ error: "Query parameter is required." });
+  }
+
+  // SQL query to search for the title in the product table
+  const sql = "SELECT * FROM product WHERE Title LIKE ?";
+  const searchValue = `%${query}%`; // For partial match
+
+  db.query(sql, [searchValue], (err, results) => {
+    if (err) {
+      console.error("Error fetching data:", err.message);
+      return res.status(500).json({ error: "Failed to fetch data." });
+    }
+
+    if (results.length === 0) {
+      return res.status(404).json({ message: "No products found." });
+    }
+
+    res.json(results);
+  });
+});
+
+
 
 // Start the server
 app.listen(5000, () => {
