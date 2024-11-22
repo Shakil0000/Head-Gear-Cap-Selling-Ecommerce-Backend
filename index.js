@@ -9,10 +9,10 @@ const nodemailer = require('nodemailer');
 
 // Setup MySQL connection
 const db = mysql.createConnection({
-  host: "localhost",
-  user: "root",
-  password: "", // Replace with your DB password
-  database: "headgear",
+  host: "sql12.freemysqlhosting.net",
+  user: "sql12746728",
+  password: "KXJT8fCBsp", // Replace with your DB password
+  database: "sql12746728",
 });
 
 db.connect((err) => {
@@ -26,7 +26,7 @@ db.connect((err) => {
 // Enable CORS to allow requests from frontend (localhost:3000)
 app.use(
   cors({
-    origin: "http://localhost:3000", // Allow only your frontend to make requests
+    origin: process.env.FRONTEND_URL || "http://localhost:3000", // Allow only your frontend to make requests
     methods: ["GET", "POST"],
     allowedHeaders: ["Content-Type"],
   })
@@ -345,6 +345,7 @@ app.get("/orders/:userId", (req, res) => {
 
 
 // Start the server
-app.listen(5000, () => {
-  console.log("Server is running on port 5000");
+const PORT = process.env.PORT || 5000;
+app.listen(PORT, () => {
+  console.log(`Server is running on port ${PORT}`);
 });
