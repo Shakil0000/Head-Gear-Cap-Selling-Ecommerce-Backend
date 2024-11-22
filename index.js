@@ -5,6 +5,7 @@ const mysql = require("mysql2");
 const cors = require("cors"); // Import the CORS package
 const app = express();
 const bcrypt = require('bcrypt');
+const nodemailer = require('nodemailer');
 
 // Setup MySQL connection
 const db = mysql.createConnection({
@@ -262,6 +263,54 @@ app.get("/orders/search", (req, res) => {
 });
 
 
+// Set up Nodemailer transporter
+const transporter = nodemailer.createTransport({
+  service: 'gmail', // Or any other email service you use
+  auth: {
+    user: 'mdshakiazzaman43@gmail.com',
+    pass: 'dkzj hgnb rgfm foie', // Use App Password for Gmail
+  },
+});
+
+
+// API endpoint for password reset
+app.post('/api/reset-password', (req, res) => {
+  const { email } = req.body;
+
+  if (!email) {
+    return res.status(400).json({ message: 'Email is required' });
+  }
+
+  // Query the database to find the user by email
+  db.query('SELECT * FROM user WHERE email = ?', [email], (err, results) => {
+    if (err) {
+      return res.status(500).json({ message: 'Database query failed' });
+    }
+
+    if (results.length === 0) {
+      return res.status(404).json({ message: 'User not found' });
+    }
+
+    const user = results[0];
+    const password = user.password; // Extract the password (ensure security!)
+
+    // Send the password to the user's email using Nodemailer
+    const mailOptions = {
+      from: 'mdshakiazzaman43@gmail.com',
+      to: email,
+      subject: 'Password Recovery',
+      text: `Your password is: ${password}`,
+    };
+
+    transporter.sendMail(mailOptions, (error, info) => {
+      if (error) {
+        return res.status(500).json({ message: 'Error sending email', error });
+      }
+
+      return res.status(200).json({ message: 'Password recovery email sent successfully' });
+    });
+  });
+});
 
 
 // Get orders for a specific user
