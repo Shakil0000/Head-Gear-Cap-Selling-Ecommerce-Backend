@@ -26,11 +26,12 @@ db.connect((err) => {
 // Enable CORS to allow requests from frontend (localhost:3000)
 app.use(
   cors({
-    origin: process.env.FRONTEND_URL || "http://localhost:3000", // Allow only your frontend to make requests
+    origin: process.env.FRONTEND_URL || "https://cute-cuchufli-da6555.netlify.app" || "http://localhost:3000",
     methods: ["GET", "POST"],
     allowedHeaders: ["Content-Type"],
   })
 );
+
 
 // Middleware to parse incoming JSON requests
 app.use(express.json());
@@ -342,7 +343,10 @@ app.get("/orders/:userId", (req, res) => {
 });
 
 
-
+// Define a simple route to return "Hello World!"
+// app.get('/', (req, res) => {
+//   res.send('Hello World!');
+// });
 
 // Start the server
 const PORT = process.env.PORT || 5000;
